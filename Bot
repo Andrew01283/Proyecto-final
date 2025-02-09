@@ -2,7 +2,6 @@ import discord
 import os
 import random
 import requests
-import settings
 import webserver 
 from discord.ext import commands
 intents = discord.Intents.default()
@@ -21,12 +20,7 @@ def get_dog_image_url():
     data = res.json()
     return data['url']
 def get_pokemon_image_url():    
-    url = 'https://pokeapi.co'
-    res = requests.get(url)
-    data = res.json()
-    return data['url']
-def get_pokemon_image_url():    
-    url = 'https://pokeapi.co'
+    url = 'https://pokeapi.co/api/v2/'
     res = requests.get(url)
     data = res.json()
     return data['url']
@@ -88,9 +82,9 @@ async def mem(ctx):
         picture = discord.File(f)
     await ctx.send(file=picture)
 @bot.command()
-async def gifs(ctx):
-    gif = random.choice(os.listdir("gif"))
-    await ctx.send(file=discord.File(f'gif/{gif}'))
+async def gif(ctx):
+    gif = random.choice(os.listdir("gifs"))
+    await ctx.send(file=discord.File(f'gifs/{gif}'))
 @bot.command('duck')
 async def duck(ctx):
     image_url = get_duck_image_url()
@@ -118,8 +112,300 @@ pasos según el metodo""")
 @bot.command()
 async def rubik(ctx):
     await ctx.send(f"""¡Genial! Veo que haz escogido mi opción para ayudarte a armar el cubo rubik.
-Cómo te puedo ayudar? Puedo enseñarte la notación, enseñarte métodos y si quieres armarlo desde cero""")
+Cómo te puedo ayudar? Puedo enseñarte la notación, enseñarte métodos y si quieres te puedo recomendar cubos.""")
+    await ctx.send(file=discord.File(f'gifs/rubikscube-madskills.gif'))
+    
+    respuestas = ["notación", "notacion","métodos", "metodos", "recomendación de cubos", "recomendacion de cubos"]
+    
+    def check_response(message):
+        return message.author == ctx.author and message.channel == ctx.channel and message.content.lower() in respuestas 
+    response = await bot.wait_for('message', check=check_response)
 
+    if response:
+#Notación
+        if response.content.lower() in ('notación', 'notacion'):
+            await ctx.send(f"Vale aquí te dejaré una guía sobre la notación del cubo rubik")
+            await ctx.send(file=discord.File(f'gifs/glep-smiling-friends.gif'))
+
+
+#Metodos
+        elif response.content.lower() in ('métodos', 'metodos'):
+            await ctx.send(f"Estupendo, cuál metodo te gustaría aprender, CFOP (reducido) o Roux")
+            await ctx.send(file=discord.File(f'gifs/glep-smiling-friends.gif'))
+            
+            respuestas2 = ["cfop", "roux"]
+            def check_metodo(message):
+                return message.author == ctx.author and message.channel == ctx.channel and message.content.lower() in respuestas2
+            response = await bot.wait_for('message', check=check_metodo)
+
+            if response:
+                if response.content.lower() == 'cfop':
+                    await ctx.send(f"""> El método **CFOP** o también conocido como Fridrich por su creadora **Jessica Fridrich**, 
+> es una técnica popular para resolver el cubo Rubik de 3x3.                       
+> Su nombre proviene de las iniciales de las cuatro fases que lo componen:  
+> **Cross (Cruz):** Se resuelve la cruz en una cara del cubo, alineando las             
+> piezas de borde con el color del centro.                                            
+> **F2L (First Two Layers):** Se resuelven las dos primeras capas, emparejando       
+> y colocando las piezas de esquina y borde simultáneamente.                         
+> **OLL (Orientation of the Last Layer):** Se orientan todas las piezas de la        
+> última capa para que el color de la cara superior sea uniforme.                         
+> **PLL (Permutation of the Last Layer):** Se permutan las piezas de la                     
+> última capa para completar el cubo.                                                               
+Con qué quieres comenzar?""")
+                    await ctx.send(file=discord.File(f'gifs/rubiks-cube-om-nom.gif'))
+
+                    respuestas3 = ["cruz", "cross", "f2l", "oll", "pll"]
+                    def check_cfop(message):
+                        return message.author == ctx.author and message.channel == ctx.channel and message.content.lower() in respuestas3 
+                    response = await bot.wait_for('message', check=check_cfop)
+                    
+                    if response: 
+                        if response.content.lower() in ('cruz', 'cross'):
+                            await ctx.send(f"""> Para armar la cruz es bastante simple, esto debido a que es más que todo intuitivo
+> nuestro objetivo es armar una cruz con las aristas de un color con su 
+> respectivo centro y que el color contrario de cada arista coincida con 
+> el de su respectivo centro.""")
+ 
+                        elif response.content.lower() == 'f2l':
+                            pass #un epico pass porque no lo he ehcho XDDDD
+
+                        elif response.content.lower() == 'oll':
+                            await ctx.send(f"""> Nuestro primer paso del oll será armar una cruz en nuestra última capa
+> dependiendo de nuestro caso ya sea que la tengas armada o puedes tener un punto, 
+> una L o una línea. En caso de que tengas la cruz escribe "siguiente", pero si 
+> tienes alguno de los otros casos ya sea el punto la L o la línea escribe 
+> punto, L o línea dependiedo de tu caso""")
+
+                            respuestas4 = ["siguiente", "punto", "l", "línea", "linea"]
+                            def check_oll(message):
+                                return message.author == ctx.author and message.channel == ctx.channel and message.content.lower() in respuestas4 
+                            response = await bot.wait_for('message', check=check_oll)
+
+                            if response: 
+                                if response.content.lower() == 'siguiente':
+                                    await oll(ctx)
+                                elif response.content.lower() == 'punto':
+                                    await cas_pnt(ctx)
+
+                                elif response.content.lower() == 'l':
+                                    await cas_L(ctx)
+                                
+                                elif response.content.lower() in ('línea', 'linea'):
+                                    await cas_line(ctx)
+                                
+                                else:
+                                    pass
+
+
+                        elif response.content.lower() == 'pll':
+                            await pll(ctx)
+    
+
+#Recomendación de cubos
+        elif response.content.lower() in ('recomendacion de cubos', 'recomendación de cubos'): 
+            await ctx.send(f"""¡Estupendo! Te puedo hacer recomendaciones según tu presuesto y gama, 
+así que dime. Quieres un cubo económico, gama media o vas por la gama alta?""")
+            resp_recom_cube = ["económico", "economico","gama media", "gama alta"]
+            def check_response_recom(message):
+                return message.author == ctx.author and message.channel == ctx.channel and message.content.lower() in resp_recom_cube 
+            response = await bot.wait_for('message', check=check_response_recom)
+
+            if response:
+                if response.content.lower() in ('económico', 'economico'):
+                    await ctx.send(f"""> Ok, entre los cubos económicos tenemos buenas opciones
+> Estos cubos ofrecen buenas capacidades por un precio accesible.
+> Te daré tres opciones estas son:
+> ☆Qiyi Sail 3x3 W☆""")
+                    await ctx.send(file=discord.File(f'enc_cube/qiyi sail 3x3.jpg'))
+                    await ctx.send(f"""> ☆El QiYi Sail 3x3 W es un cubo de rubik de 3x3 económico y de tamaño 
+> ☆ligeramente más grande que el estándar (56 mm en lugar de los típicos 55 mm). 
+> ☆Es una opción popular entre principiantes y quienes buscan un cubo barato pero 
+> ☆funcional. Su precio ronda los 5-7 dolares americanos según la tienda.
+
+**Características principales**
+✅ Tamaño: 56 mm
+✅ Peso: Alrededor de 90 g
+✅ Superficie: Stickerless (sin pegatinas) o con stickers según la versión
+✅ Calidad de giro: Suave, pero más lento en comparación con cubos de gama alta
+✅ Corte de esquinas: Moderado, no tan bueno como en cubos de velocidad premium
+☆¿Quieres ver la siguiente opción?""")
+                    
+
+
+
+async def pll(ctx):
+    await ctx.send("""> Bien ya que tenemos la última capa orientada es hora de permutar 
+> las piezas. A continueación te envieré algunos casos de pll, pero 
+> primero empezamos por las esquinas o las aristas? Escribe "Esquinas" o "Aristas"
+> para ir con casos de permutación de las mismas. Tras eso escribe "siguiente" 
+> hasta encontrar tu caso o "listo" si lo encontraste.
+> Al terminar ya habrás armdo el cubo.""")
+    respuestas_pll = ["aristas", "esquinas"]
+    def check_pll(message):
+        return message.author == ctx.author and message.channel == ctx.channel and message.content.lower() in respuestas_pll 
+    response = await bot.wait_for('message', check=check_pll)
+    if response:
+        if response.content.lower() == 'esquinas':
+            await PLLE(ctx)
+        elif response.content.lower() == 'aristas':
+            await PLLA(ctx)
+
+async def PLLE(ctx):
+    pll1 = os.listdir('PllE')
+    pll_indx = 0
+    while True:
+        if pll_indx == len(pll1):
+            pll_indx = 0
+            await ctx.send(f'☆Ya esos son todos los casos, revisa por si te perdiste de alguno☆')
+            break
+        caso_act_pll = pll1[pll_indx]
+        with open(f'PllE/{caso_act_pll}', 'rb') as f:
+            picture = discord.File(f)
+        await ctx.send(file=picture)
+        resp_cas_pllE = ["siguiente", "listo"]
+        def check_cas_pllE(message):
+            return message.author == ctx.author and message.channel == ctx.channel and message.content.lower() in  resp_cas_pllE
+        response = await bot.wait_for('message', check=check_cas_pllE)
+                
+        if response: 
+            if response.content.lower() == 'siguiente':
+                pll_indx += 1
+                if pll_indx < len(pll1):
+                    await ctx.send(f'*☆Aquí tienes el siguiente caso de PLL☆*')
+
+            elif response.content.lower() == 'listo':
+                await ctx.send(f'¡Perfecto! Quieres ir al PLL de aristas? Escribe "Si" para ir o "No" para quedarte aquí')
+                resp_prox_pllE = ["si", "no"]
+                def check_prox_pllA(message):
+                    return message.author == ctx.author and message.channel == ctx.channel and message.content.lower()  in resp_prox_pllE
+                response = await bot.wait_for('message', check=check_prox_pllA)
+                if response:
+                    if response.content.lower() == 'si':
+                        await PLLA(ctx)
+                    elif response.content.lower() == 'no':
+                        await ctx.send(f'Ok XD')
+                        await ctx.send(file=discord.File(f'gifs/axlotle-rubiks-cube.gif'))
+                break
+
+async def PLLA(ctx):
+    pll2 = os.listdir('PllA')
+    pllA_indx = 0
+    while True:
+        if pllA_indx == len(pll2):
+            pllA_indx = 0
+            await ctx.send(f'☆Ya esos son todos los casos, revisa por si te perdiste de alguno☆')
+            break
+        caso_act_pllA = pll2[pllA_indx]
+        with open(f'PllA/{caso_act_pllA}', 'rb') as f:
+            picture = discord.File(f)
+        await ctx.send(file=picture)
+        resp_cas_pllA = ["siguiente", "listo"]
+        def check_cas_pllA(message):
+            return message.author == ctx.author and message.channel == ctx.channel and message.content.lower() in resp_cas_pllA 
+        response = await bot.wait_for('message', check=check_cas_pllA)
+                
+        if response: 
+            if response.content.lower() == 'siguiente':
+                pllA_indx += 1
+                if pllA_indx < len(pll2):
+                    await ctx.send(f'*☆Aquí tienes el siguiente caso de PLL☆*')
+            elif response.content.lower() == 'listo':
+                await ctx.send(f'¡Perfecto! Quieres ir al PLL de esquinas? Escribe "Si" para ir o "No" para quedarte aquí')
+                resp_prox_pllA = ["si", "no"]
+                def check_prox_pllA(message):
+                    return message.author == ctx.author and message.channel == ctx.channel and message.content.lower()  in resp_prox_pllA
+                response = await bot.wait_for('message', check=check_prox_pllA)
+                if response:
+                    if response.content.lower() == 'si':
+                        await PLLE(ctx)
+                    elif response.content.lower() == 'no':
+                        await ctx.send(f'Ok XD')
+                        await ctx.send(file=discord.File(f'gifs/axlotle-rubiks-cube.gif'))
+                break
+
+async def oll(ctx):
+    await ctx.send(f"""> Bien, ya que tenemos la cruz ahora debemos reconocer nuestro caso de oll.
+> A continueación te envieré algunos casos de oll, escribe siguiente
+> hasta encontrar el caso que te haya tocado.""")
+    await ctx.send(f'*☆Si encontras tu caso escribe "listo"☆*')
+    
+    oll1 = os.listdir('Oll')
+    oll_indx = 0
+    while True:
+        if oll_indx == len(oll1):
+            oll_indx = 0
+            await ctx.send(f'☆Ya esos son todos los casos, revisa los que te envié por si te perdiste de alguno☆')
+            break
+            
+        caso_act = oll1[oll_indx]
+        with open(f'Oll/{caso_act}', 'rb') as f:
+            picture = discord.File(f)
+        await ctx.send(file=picture)
+        resp_cas_oll = ["listo", "siguiente"]
+        def check_cas_oll(message):
+            return message.author == ctx.author and message.channel == ctx.channel and message.content.lower() in resp_cas_oll 
+        response = await bot.wait_for('message', check=check_cas_oll)
+        
+        if response: 
+            if response.content.lower() == 'siguiente':
+                oll_indx += 1
+                if oll_indx < len(oll1):
+                    await ctx.send(f'*☆Aquí tienes el siguiente caso de OLL☆*')
+
+            elif response.content.lower() == 'listo':
+                await ctx.send(f'¡Perfecto! Quieres ir al PLL? Escribe "Si" para ir o "No" para quedarte aquí')
+                resp_prox_pll = ["si", "no"]
+                def check_prox_pll(message):
+                    return message.author == ctx.author and message.channel == ctx.channel and message.content.lower()  in resp_prox_pll
+                response = await bot.wait_for('message', check=check_prox_pll)
+                if response:
+                    if response.content.lower() == 'si':
+                        await pll(ctx)
+                    elif response.content.lower() == 'no':
+                        await ctx.send(f'Ok XD')
+                break
+       
+async def cas_pnt(ctx):
+    await ctx.send(f"""☆Bien en el caso de punto es muy simple, haremos un algoritmo
+para conseguir un caso que este si nos llevará a la cruz☆""")
+    await ctx.send(file=discord.File(f'pas_cruz/caso_punto.png'))
+    await ctx.send(f"""☆Este caso muy posiblemente te lleve al caso L. Escribe "siguiente"
+para continuar al caso que nos sigue☆""")
+    def check_pnt(message):
+        return message.author == ctx.author and message.channel == ctx.channel and message.content.lower() == 'siguiente'
+    response = await bot.wait_for('message', check=check_pnt)
+    if response:
+        if response.content.lower() == 'siguiente':
+            await cas_L(ctx)
+
+async def cas_L(ctx):
+    await ctx.send(f"""☆Vale, estamos en el caso de la L, con solo un algoritmo
+tendremos nuestra cruz☆""")
+    await ctx.send(file=discord.File(f'pas_cruz/caso_L.png'))
+    await ctx.send("""☆¡Enhorabuena! tras este simple algoritmo tendrémos nuestra cruz.
+Escribe "siguiente" para ir a los casos de oll☆""")
+    def check_cas_l(message):
+        return message.author == ctx.author and message.channel == ctx.channel and message.content.lower() == 'siguiente'
+    response = await bot.wait_for('message', check=check_cas_l)
+    if response:
+        if response.content.lower() == 'siguiente':
+            await oll(ctx)
+
+async def cas_line(ctx):
+    await ctx.send(f"""☆¡Increíble, estamos en el caso de la línea, solo haz este
+algoritmo y tendremos nuestras curz para posteriormente
+buscar nuestro caso de oll☆""")
+    await ctx.send(file=discord.File(f'pas_cruz/caso_linea.png'))
+    await ctx.send("""☆Ok, tras este caso ya debes tener la cruz hecha. Escribe "siguiente"
+para continuar a los casos de oll☆""")
+    def check_cas_line(message):
+        return message.author == ctx.author and message.channel == ctx.channel and message.content.lower() == 'siguiente'
+    response = await bot.wait_for('message', check=check_cas_line)
+    if response:
+        if response.content.lower() == 'siguiente':
+            await oll(ctx)
+  
+  
 
 webserver.keep_alive()
-bot.run("XD")
+bot.run("pon tu token")
